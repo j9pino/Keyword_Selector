@@ -48,7 +48,7 @@ def main():
     st.title("Keyword Selector")
 
     # File Upload
-    uploaded_file = st.file_uploader("Upload a CSV file", type=["csv"])
+    uploaded_file = st.file_uploader("Upload a CSV file from Scopus. Your file must include, at minimum, the columns for Title, Abstract, Author Keywords, and Index Keywords.", type=["csv"])
 
     if uploaded_file is not None:
         # Read the CSV file into a DataFrame
@@ -66,6 +66,10 @@ def main():
 
         # Export the most frequent words in the Summary column
         st.markdown(get_top_words_csv(df), unsafe_allow_html=True)
+
+        # Display the final message
+        st.markdown("Done! Now you may download your updated spreadsheet and a list of the top 1,000 keywords overall.")
+
 
 # Function to create a download link for a DataFrame as a CSV file
 def get_csv_download_link(df):
