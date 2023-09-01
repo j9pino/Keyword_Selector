@@ -20,9 +20,9 @@ def clean_and_concat(row):
     author_keywords = row['Author Keywords'] if not pd.isna(row['Author Keywords']) else ""
     index_keywords = row['Index Keywords'] if not pd.isna(row['Index Keywords']) else ""
 
-    # Remove punctuation from Title and Abstract
-    title = title.translate(str.maketrans('', '', string.punctuation))
-    abstract = abstract.translate(str.maketrans('', '', string.punctuation))
+    # Remove punctuation from Title and Abstract (excluding hyphens)
+    title = re.sub(r'[^\w\s-]', '', title)
+    abstract = re.sub(r'[^\w\s-]', '', abstract)
 
    # Remove numbers from Title and Abstract
     title = re.sub(r'\d+', '', title)
