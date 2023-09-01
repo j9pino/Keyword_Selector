@@ -1,7 +1,5 @@
 streamlit
 pandas
 nltk
-base64
-import Counter
-string
+collections
 stopwords
