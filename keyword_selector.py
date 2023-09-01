@@ -24,6 +24,10 @@ def clean_and_concat(row):
     title = title.translate(str.maketrans('', '', string.punctuation))
     abstract = abstract.translate(str.maketrans('', '', string.punctuation))
 
+   # Remove numbers from Title and Abstract
+    title = re.sub(r'\d+', '', title)
+    abstract = re.sub(r'\d+', '', abstract)
+
     # Remove text including and after the copyright symbol (©) in the Abstract
     abstract = re.sub(r'©.*', '', abstract)
 
@@ -51,6 +55,9 @@ def main():
     uploaded_file = st.file_uploader("Upload a CSV file from Scopus. Your file must include, at minimum, the columns for Title, Abstract, Author Keywords, and Index Keywords.", type=["csv"])
 
     if uploaded_file is not None:
+        # Display a message while processing
+        st.text("Processing the file... Please wait.")
+
         # Read the CSV file into a DataFrame
         df = pd.read_csv(uploaded_file)
 
@@ -64,11 +71,14 @@ def main():
         # Download the updated CSV file
         st.markdown(get_csv_download_link(df), unsafe_allow_html=True)
 
+        # Display a message while processing the top 1,000 words
+        st.text("Processing the top 1,000 words... Please wait.")
+
         # Export the most frequent words in the Summary column
         st.markdown(get_top_words_csv(df), unsafe_allow_html=True)
 
         # Display the final message
-        st.markdown("Done! Now you may download your updated spreadsheet and a list of the top 1,000 keywords overall.")
+        st.markdown("Done! Now you may download your updated spreadsheet and a list of the top 1,000 keywords overall. Please note that some phrases such as 'Carbon Dioxide' may have been recognized as separate terms by the program.")
 
 
 # Function to create a download link for a DataFrame as a CSV file
