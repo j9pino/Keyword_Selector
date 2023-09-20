@@ -52,7 +52,7 @@ def main():
     st.title("Keyword Selector")
 
     # File Upload
-    uploaded_file = st.file_uploader("Upload a CSV file from Scopus. Your file must include, at minimum, the columns for Title, Abstract, Author Keywords, and Index Keywords.", type=["csv"])
+    uploaded_file = st.file_uploader("Upload a CSV file from Scopus. Your file must include the columns for Title, Abstract, Author Keywords, and Index Keywords.", type=["csv"])
 
     if uploaded_file is not None:
         # Display a message while processing
@@ -78,17 +78,16 @@ def main():
         st.markdown(get_top_words_csv(df), unsafe_allow_html=True)
 
         # Display the final message
-        st.markdown("Done! Now you may download your updated spreadsheet and a list of the top 1,000 keywords overall. Please note that some phrases such as 'Carbon Dioxide' may have been recognized as separate terms by the program.")
-
+        st.markdown("Done! Now you may download your updated spreadsheet and a list of the top 1,000 keywords overall (which may be used with your favorite word cloud generator). Please note that some phrases such as 'Carbon Dioxide' may have been recognized as separate terms by the program.")
 
 # Function to create a download link for a DataFrame as a CSV file
 def get_csv_download_link(df):
     csv = df.to_csv(index=False)
     b64 = base64.b64encode(csv.encode()).decode()
-    href = f'<a href="data:file/csv;base64,{b64}" download="updated_keywords.csv">Download Updated CSV File</a>'
+    href = f'<a href="data:file/csv;base64,{b64}" download="updated_keywords.csv">Download Updated CSV</a>'
     return href
 
-# Function to get the 1,000 most frequent words (excluding punctuation) from the Summary column and export them to a CSV
+# Function to get the 1,000 most frequent words (excluding punctuation) from the Summary column and export them to a CSV without headers
 def get_top_words_csv(df):
     # Combine all the Summary text into a single string
     all_summary_text = ' '.join(df['Summary'].tolist())
@@ -100,14 +99,14 @@ def get_top_words_csv(df):
 
     word_counts = Counter(words)
 
-    # Get the 1,000 most frequent words
+    # Get the 1,000 most frequent words as a list of tuples (frequency, word)
     most_common_words = word_counts.most_common(1000)
 
-    # Create a DataFrame with the most frequent words
-    top_words_df = pd.DataFrame(most_common_words, columns=['Word', 'Frequency'])
+    # Create a list of lists where each inner list is [frequency, word]
+    top_words_list = [[freq, word] for word, freq in most_common_words]
 
-    # Export the top words to a CSV
-    top_words_csv = top_words_df.to_csv(index=False)
+    # Export the top words to a CSV without headers
+    top_words_csv = '\n'.join([','.join(map(str, word_freq)) for word_freq in top_words_list])
     b64 = base64.b64encode(top_words_csv.encode()).decode()
     href = f'<a href="data:file/csv;base64,{b64}" download="top_words.csv">Download Top Words CSV</a>'
     return href
