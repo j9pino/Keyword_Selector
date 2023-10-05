@@ -13,18 +13,17 @@ nltk.download('punkt')
 # Import stopwords
 from nltk.corpus import stopwords
 
-# Function to clean and concatenate text
 def clean_and_concat(row):
-    title = row['Title'] if not pd.isna(row['Title']) else ""
-    abstract = row['Abstract'] if not pd.isna(row['Abstract']) else ""
-    author_keywords = row['Author Keywords'] if not pd.isna(row['Author Keywords']) else ""
-    index_keywords = row['Index Keywords'] if not pd.isna(row['Index Keywords']) else ""
+    title = row['Title'] if 'Title' in row and not pd.isna(row['Title']) else ""
+    abstract = row['Abstract'] if 'Abstract' in row and not pd.isna(row['Abstract']) else ""
+    author_keywords = row['Author Keywords'] if 'Author Keywords' in row and not pd.isna(row['Author Keywords']) else ""
+    index_keywords = row['Index Keywords'] if 'Index Keywords' in row and not pd.isna(row['Index Keywords']) else ""
 
     # Remove punctuation from Title and Abstract (excluding hyphens)
     title = re.sub(r'[^\w\s-]', '', title)
     abstract = re.sub(r'[^\w\s-]', '', abstract)
 
-   # Remove numbers from Title and Abstract
+    # Remove numbers from Title and Abstract
     title = re.sub(r'\d+', '', title)
     abstract = re.sub(r'\d+', '', abstract)
 
@@ -52,7 +51,7 @@ def main():
     st.title("Keyword Selector")
 
     # File Upload
-    uploaded_file = st.file_uploader("Upload a CSV file from Scopus. Your file must include the columns for Title, Abstract, Author Keywords, and Index Keywords.", type=["csv"])
+    uploaded_file = st.file_uploader("Upload a CSV file from Scopus. They keyword selector will be looking for any of these columns: Title, Abstract, Author Keywords, and Index Keywords.", type=["csv"])
 
     if uploaded_file is not None:
         # Display a message while processing
