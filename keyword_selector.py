@@ -7,14 +7,18 @@ from collections import Counter
 import string
 from nltk.corpus import stopwords
 
-# Attempt to download necessary NLTK resources
-try:
-    nltk.download('stopwords', quiet=True)
-    nltk.download('punkt', quiet=True)
-except Exception as e:
-    st.error(f"Error downloading NLTK resources: {e}")
+# Function to ensure NLTK resources are available
+def ensure_nltk_resources():
+    try:
+        nltk.download('stopwords', quiet=True)
+        nltk.download('punkt', quiet=True)
+    except Exception as e:
+        st.error(f"Error downloading NLTK resources: {e}")
 
 def clean_and_concat(row):
+    # Ensure NLTK resources are downloaded before processing
+    ensure_nltk_resources()
+    
     title = row['Title'] if 'Title' in row and not pd.isna(row['Title']) else ""
     abstract = row['Abstract'] if 'Abstract' in row and not pd.isna(row['Abstract']) else ""
     author_keywords = row['Author Keywords'] if 'Author Keywords' in row and not pd.isna(row['Author Keywords']) else ""
@@ -100,6 +104,9 @@ def get_csv_download_link(df):
 
 # Function to get the 1,000 most frequent words (excluding punctuation) from the Summary column and export them to a CSV without headers
 def get_top_words_csv(df):
+    # Ensure NLTK resources are downloaded before processing
+    ensure_nltk_resources()
+
     # Combine all the Summary text into a single string
     all_summary_text = ' '.join(df['Summary'].tolist())
 
