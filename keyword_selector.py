@@ -3,15 +3,16 @@ import pandas as pd
 import re
 import nltk
 import base64
-from collections import Counter  # Import Counter for word frequency
+from collections import Counter
 import string
-
-# Download the NLTK stopwords dataset and punkt tokenizer
-nltk.download('stopwords')
-nltk.download('punkt')
-
-# Import stopwords
 from nltk.corpus import stopwords
+
+# Attempt to download necessary NLTK resources
+try:
+    nltk.download('stopwords', quiet=True)
+    nltk.download('punkt', quiet=True)
+except Exception as e:
+    st.error(f"Error downloading NLTK resources: {e}")
 
 def clean_and_concat(row):
     title = row['Title'] if 'Title' in row and not pd.isna(row['Title']) else ""
@@ -46,24 +47,32 @@ def clean_and_concat(row):
 
     return summary
 
-# Streamlit app
 def main():
     st.title("Keyword Selector")
 
     # File Upload
-    uploaded_file = st.file_uploader("Upload a CSV file from Scopus. They keyword selector will be looking for any of these columns: Title, Abstract, Author Keywords, and Index Keywords.", type=["csv"])
+    uploaded_file = st.file_uploader(
+        "Upload a CSV file from Scopus. The keyword selector will look for these columns: Title, Abstract, Author Keywords, and Index Keywords.", 
+        type=["csv"]
+    )
 
     if uploaded_file is not None:
-        # Display a message while processing
         st.text("Processing the file... Please wait.")
 
         # Read the CSV file into a DataFrame
         df = pd.read_csv(uploaded_file)
 
+        # Check if required columns are present
+        required_columns = ['Title', 'Abstract', 'Author Keywords', 'Index Keywords']
+        missing_columns = [col for col in required_columns if col not in df.columns]
+        if missing_columns:
+            st.error(f"Missing columns: {', '.join(missing_columns)}. Please upload a valid CSV file.")
+            return
+
         # Create a new 'Summary' column by applying the clean_and_concat function
         df['Summary'] = df.apply(clean_and_concat, axis=1)
 
-        # Export the updated DataFrame to a new CSV file
+        # Display the updated DataFrame
         st.subheader("Updated CSV File:")
         st.dataframe(df, height=400)
 
@@ -77,7 +86,10 @@ def main():
         st.markdown(get_top_words_csv(df), unsafe_allow_html=True)
 
         # Display the final message
-        st.markdown("Done! Now you may download your updated spreadsheet and a list of the top 1,000 keywords overall (which may be used with your favorite word cloud generator). Please note that some phrases such as 'Carbon Dioxide' may have been recognized as separate terms by the program.")
+        st.markdown(
+            "Done! You may download your updated spreadsheet and a list of the top 1,000 keywords for use with word cloud generators. "
+            "Please note that some phrases such as 'Carbon Dioxide' may have been recognized as separate terms by the program."
+        )
 
 # Function to create a download link for a DataFrame as a CSV file
 def get_csv_download_link(df):
