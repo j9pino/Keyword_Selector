@@ -10,8 +10,10 @@ from nltk.corpus import stopwords
 # Function to ensure NLTK resources are available
 def ensure_nltk_resources():
     try:
+        # Download essential NLTK resources
         nltk.download('stopwords', quiet=True)
         nltk.download('punkt', quiet=True)
+        nltk.download('punkt_tab', quiet=True)  # Explicitly download punkt_tab to avoid LookupError
     except Exception as e:
         st.error(f"Error downloading NLTK resources: {e}")
 
